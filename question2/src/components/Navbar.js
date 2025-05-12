@@ -6,14 +6,26 @@ const Navbar = () => {
   return (
     <AppBar position="static">
       <Toolbar>
-        <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
+        <Typography
+          variant="h6"
+          component={Link}
+          to="/"
+          sx={{
+            flexGrow: 1,
+            color: "inherit",
+            textDecoration: "none",
+            "&:hover": {
+              textDecoration: "underline",
+            },
+          }}
+        >
           Stock Analytics
         </Typography>
         <Button color="inherit" component={Link} to="/stock">
           Stock Analysis
         </Button>
         <Button color="inherit" component={Link} to="/correlation">
-          Correlation Heatmap
+          Correlation
         </Button>
       </Toolbar>
     </AppBar>

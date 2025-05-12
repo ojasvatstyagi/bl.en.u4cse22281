@@ -17,6 +17,10 @@ const calculateStdDev = (prices) => {
 };
 
 const CorrelationHeatmap = ({ data }) => {
+  if (!data || !data.stocks || Object.keys(data.stocks).length === 0) {
+    return <Typography>No correlation data available</Typography>;
+  }
+
   const stocks = Object.keys(data.stocks);
 
   return (

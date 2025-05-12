@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Box, Typography, Paper, Grid, TextField, Button } from "@mui/material";
+import { Box, Typography, Paper, TextField, Button } from "@mui/material";
 import CorrelationHeatmap from "../components/CorrelationHeatmap";
 import { fetchCorrelationData } from "../services/api";
 import MenuItem from "@mui/material/MenuItem";
@@ -16,6 +16,15 @@ const CorrelationPage = () => {
     const loadData = async () => {
       setLoading(true);
       try {
+        // Check if exactly 2 tickers are selected
+        if (tickers.length !== 2) {
+          setCorrelationData(null);
+          setError("Please select exactly 2 tickers for correlation.");
+          setLoading(false);
+          return;
+        }
+
+        // Fetch the correlation data from the backend
         const data = await fetchCorrelationData(tickers, timeInterval);
         setCorrelationData(data);
         setError(null);
@@ -26,13 +35,17 @@ const CorrelationPage = () => {
       }
     };
 
-    if (tickers.length >= 2) {
-      loadData();
-    }
+    loadData();
   }, [tickers, timeInterval]);
 
   const handleAddTicker = () => {
     if (newTicker && !tickers.includes(newTicker.toUpperCase())) {
+      if (tickers.length >= 2) {
+        setError(
+          "Maximum 2 tickers allowed. Remove one before adding another."
+        );
+        return;
+      }
       setTickers([...tickers, newTicker.toUpperCase()]);
       setNewTicker("");
     }
@@ -40,6 +53,9 @@ const CorrelationPage = () => {
 
   const handleRemoveTicker = (tickerToRemove) => {
     setTickers(tickers.filter((ticker) => ticker !== tickerToRemove));
+    if (error && tickers.length - 1 === 2) {
+      setError(null);
+    }
   };
 
   return (
@@ -50,6 +66,9 @@ const CorrelationPage = () => {
 
       <Box sx={{ mb: 3 }}>
         <Typography variant="h6">Selected Stocks</Typography>
+        <Typography variant="body2" color="text.secondary" gutterBottom>
+          (Select exactly 2 stocks for correlation analysis)
+        </Typography>
         <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1, mb: 2 }}>
           {tickers.map((ticker) => (
             <Paper
@@ -81,11 +100,12 @@ const CorrelationPage = () => {
             value={newTicker}
             onChange={(e) => setNewTicker(e.target.value)}
             size="small"
+            disabled={tickers.length >= 2}
           />
           <Button
             variant="contained"
             onClick={handleAddTicker}
-            disabled={!newTicker}
+            disabled={!newTicker || tickers.length >= 2}
           >
             Add
           </Button>
@@ -110,7 +130,11 @@ const CorrelationPage = () => {
       </Box>
 
       {loading && <Typography>Loading...</Typography>}
-      {error && <Typography color="error">{error}</Typography>}
+      {error && (
+        <Typography color="error" sx={{ mb: 2 }}>
+          {error}
+        </Typography>
+      )}
       {correlationData && <CorrelationHeatmap data={correlationData} />}
     </Paper>
   );

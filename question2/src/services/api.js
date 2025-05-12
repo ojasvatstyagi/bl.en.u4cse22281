@@ -1,30 +1,30 @@
-import axios from "axios";
+const API_URL = "http://localhost:6969"; // Replace with deployed URL if needed
 
-const API_BASE_URL = "http://localhost:3001"; // Your backend URL
-
-export const fetchStockData = async (ticker, minutes) => {
+// Fetch average price data for a stock
+export const fetchStockData = async (ticker, interval = 30) => {
   try {
-    const response = await axios.get(
-      `${API_BASE_URL}/stock/${ticker}/average`,
-      {
-        params: { minutes },
-      }
-    );
-    return response.data;
-  } catch (error) {
-    console.error("Error fetching stock data:", error);
-    throw error;
+    const res = await fetch(`${API_URL}/stocks/${ticker}?interval=${interval}`);
+    if (!res.ok) throw new Error("Failed to fetch stock data");
+    return await res.json();
+  } catch (err) {
+    throw err;
   }
 };
 
-export const fetchCorrelationData = async (tickers, minutes) => {
+// Fetch correlation for exactly 2 tickers
+export const fetchCorrelationData = async (tickers, interval = 30) => {
+  if (tickers.length !== 2) throw new Error("Exactly 2 tickers are required");
+
+  const url = new URL(`${API_URL}/stockcorrelation`);
+  url.searchParams.append("ticker", tickers[0]);
+  url.searchParams.append("ticker", tickers[1]);
+  url.searchParams.append("interval", interval);
+
   try {
-    const response = await axios.get(`${API_BASE_URL}/stock/correlation`, {
-      params: { ticker: tickers, minutes },
-    });
-    return response.data;
-  } catch (error) {
-    console.error("Error fetching correlation data:", error);
-    throw error;
+    const res = await fetch(url.toString());
+    if (!res.ok) throw new Error("Failed to fetch correlation data");
+    return await res.json();
+  } catch (err) {
+    throw err;
   }
 };

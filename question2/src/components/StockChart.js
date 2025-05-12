@@ -13,6 +13,9 @@ import {
 import { Paper, Typography, Box } from "@mui/material";
 
 const StockChart = ({ data }) => {
+  if (!data || !data.priceHistory?.length) {
+    return <Typography>No data available</Typography>;
+  }
   const chartData = data.priceHistory.map((item) => ({
     ...item,
     timestamp: new Date(item.lastUpdatedAt).toLocaleTimeString(),
