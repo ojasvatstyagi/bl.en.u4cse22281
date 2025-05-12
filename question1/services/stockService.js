@@ -4,14 +4,27 @@ require("dotenv").config();
 const accessToken = process.env.ACCESS_TOKEN;
 
 const fetchStockData = async (ticker, minutes) => {
-  // fetch stock data from the API
   const url = `https://www.alphavantage.co/query?function=TIME_SERIES_INTRADAY&symbol=${ticker}&interval=5min&apikey=${accessToken}`;
+
   const res = await axios.get(url, {
     headers: {
       Authorization: `Bearer ${accessToken}`,
     },
   });
+
+  if (res.data["Note"]) {
+    throw new Error("API rate limit exceeded. Please wait and try again.");
+  }
+
+  if (res.data["Error Message"]) {
+    throw new Error(`Invalid ticker symbol: ${ticker}`);
+  }
+
   const data = res.data["Time Series (5min)"];
+  if (!data) {
+    throw new Error("Stock data not available or improperly formatted.");
+  }
+
   return Object.entries(data).map(([timestamp, values]) => ({
     timestamp,
     price: parseFloat(values["1. open"]),

@@ -38,7 +38,7 @@ function App() {
         <Navbar />
         <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
           <Routes>
-            <Route path="/stock" element={<StockSelectionPage />} />
+            <Route path="/" element={<StockSelectionPage />} />
             <Route path="/stock/:ticker" element={<StockAnalysisPage />} />
             <Route path="/correlation" element={<CorrelationPage />} />
           </Routes>

@@ -21,7 +21,7 @@ const Navbar = () => {
         >
           Stock Analytics
         </Typography>
-        <Button color="inherit" component={Link} to="/stock">
+        <Button color="inherit" component={Link} to="/">
           Stock Analysis
         </Button>
         <Button color="inherit" component={Link} to="/correlation">
